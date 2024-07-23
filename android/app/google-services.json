@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1092084812416",
+    "project_id": "awesome-to-do-5170a",
+    "storage_bucket": "awesome-to-do-5170a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1092084812416:android:325364c0dcae2b7f933465",
+        "android_client_info": {
+          "package_name": "com.example.awesome_to_do"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_x1pOhYFGqb50G75oPxRlXcIGxm-sd7g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1092084812416:android:ca88a83c744cb187933465",
+        "android_client_info": {
+          "package_name": "com.example.awesome_todo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_x1pOhYFGqb50G75oPxRlXcIGxm-sd7g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
