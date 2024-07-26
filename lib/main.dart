@@ -1,28 +1,21 @@
+import 'package:awesome_to_do/injection.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
-import 'app.dart';
-import 'settings/settings_controller.dart';
-import 'settings/settings_service.dart';
+import 'app/app.dart';
+import 'hive.dart';
 
 void main() async {
-  // Set up the SettingsController, which will glue user settings to multiple
-  // Flutter Widgets.
-  final settingsController = SettingsController(SettingsService());
-
-  // Load the user's preferred theme while the splash screen is displayed.
-  // This prevents a sudden theme change when the app is first displayed.
-  await settingsController.loadSettings();
   await mainInitSetup();
-
-  // Run the app and pass in the SettingsController. The app listens to the
-  // SettingsController for changes, then passes it further down to the
-  // SettingsView.
-  runApp(ToDoApp(
-    settingsController: settingsController,
-  ));
+  runApp(const ToDoApp());
 }
 
 Future<void> mainInitSetup() async {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await Firebase.initializeApp();
+  configureInjection();
+  await initHive();
+  FlutterNativeSplash.remove();
 }
