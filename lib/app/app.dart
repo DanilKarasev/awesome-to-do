@@ -17,7 +17,7 @@ class ToDoApp extends StatelessWidget {
     return BlocProvider(
       create: (_) => AppBloc(
         authRepository: getIt<AuthRepository>(),
-      ),
+      )..init(),
       child: const AppView(),
     );
   }

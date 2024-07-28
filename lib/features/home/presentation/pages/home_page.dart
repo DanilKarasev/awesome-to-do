@@ -1,7 +1,10 @@
+import 'package:awesome_to_do/features/home/presentation/bloc/home_cubit.dart';
+import 'package:awesome_to_do/features/home/presentation/widgets/tasks_tab_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/bloc/app_bloc.dart';
+import '../../../../core/utils/alert.dart';
 import '../widgets/avatar.dart';
 
 class HomePage extends StatelessWidget {
@@ -11,33 +14,59 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
     final user = context.select((AppBloc bloc) => bloc.state.user);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-        actions: <Widget>[
-          IconButton(
-            key: const Key('homePage_logout_iconButton'),
-            icon: const Icon(Icons.exit_to_app),
-            onPressed: () {
-              context.read<AppBloc>().add(const AppLogoutRequested());
-            },
-          ),
-        ],
-      ),
-      body: Align(
-        alignment: const Alignment(0, -1 / 3),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Avatar(photo: user.photo),
-            const SizedBox(height: 4),
-            Text(user.email ?? '', style: textTheme.titleLarge),
-            const SizedBox(height: 4),
-            Text(user.name ?? '', style: textTheme.headlineSmall),
-          ],
+
+    return BlocProvider(
+      create: (_) => HomeCubit()..init(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(context.read<AppBloc>().appName),
         ),
+        drawer: Drawer(
+          child: SafeArea(
+            child: Column(
+              children: <Widget>[
+                Avatar(photo: user.photo),
+                const SizedBox(height: 4),
+                Text(user.email ?? '', style: textTheme.titleLarge),
+                const SizedBox(height: 4),
+                Text(user.name ?? '', style: textTheme.headlineSmall),
+                ListTile(
+                  dense: true,
+                  title: const Text(
+                    'Log Out',
+                  ),
+                  leading: const Icon(Icons.exit_to_app),
+                  onTap: () async {
+                    Alert.confirmationDialog(
+                      context: context,
+                      title: 'Logout',
+                      body: 'Are you sure you want to logout?',
+                      onPressPositive: () => context
+                          .read<AppBloc>()
+                          .add(const AppLogoutRequested()),
+                    );
+                  },
+                ),
+                const Spacer(),
+                Text(
+                  context.read<AppBloc>().appVersion,
+                  style: const TextStyle(fontSize: 12.0),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+        body: const TasksTabView(),
+        floatingActionButton: Builder(builder: (context) {
+          return FloatingActionButton(
+            onPressed: context.read<HomeCubit>().addDummyTask,
+            child: const Icon(Icons.add),
+          );
+        }),
       ),
     );
   }

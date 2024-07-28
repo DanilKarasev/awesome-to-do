@@ -15,7 +15,6 @@ class SignUpForm extends StatelessWidget {
     return BlocListener<SignUpCubit, SignUpState>(
       listener: (context, state) {
         if (state.status.isSuccess) {
-          // TODO: Navigate back and login
           Navigator.of(context).pop();
         } else if (state.status.isFailure) {
           showSnackBar(

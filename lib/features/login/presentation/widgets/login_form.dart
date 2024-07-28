@@ -1,4 +1,5 @@
 import 'package:awesome_to_do/core/utils/text_field_validators.dart';
+import 'package:awesome_to_do/core/widgets/generic_snackbar.dart';
 import 'package:awesome_to_do/core/widgets/generic_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,13 +17,10 @@ class LoginForm extends StatelessWidget {
     return BlocListener<LoginCubit, LoginState>(
       listener: (context, state) {
         if (state.status.isFailure) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage ?? 'Authentication Failure'),
-              ),
-            );
+          showSnackBar(
+            context,
+            label: state.errorMessage ?? 'Authentication Failure',
+          );
         }
       },
       child: Padding(
