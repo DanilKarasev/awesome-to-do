@@ -23,9 +23,16 @@ class AppView extends StatelessWidget {
       ),
       darkTheme: ThemeData.dark(),
       builder: BotToastInit(),
-      home: FlowBuilder<AppStatus>(
-        state: context.select((AppBloc bloc) => bloc.state.status),
-        onGeneratePages: onGenerateAppViewPages,
+      home: Scaffold(
+        body: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 700),
+            child: FlowBuilder<AppStatus>(
+              state: context.select((AppBloc bloc) => bloc.state.status),
+              onGeneratePages: onGenerateAppViewPages,
+            ),
+          ),
+        ),
       ),
     );
   }
