@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/widgets/toast.dart';
+import '../../../create_or_update_task/presentation/pages/create_or_update_task_page.dart';
 
 class TaskDetailsBottomSheet extends StatelessWidget {
   final TaskEntity task;
@@ -52,13 +53,22 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                       ],
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => print('EDIT'),
-                    icon: Icon(
-                      Icons.edit,
-                      color: theme.primaryColor,
+                  if (!task.status.isDone)
+                    IconButton(
+                      onPressed: () async {
+                        //TODO: bottomsheet should update it's UI after updating the task
+                        //most likely should use pop-completer and UI rebuild
+                        await Navigator.of(context).maybePop();
+                        //ignore: use_build_context_synchronously
+                        Navigator.of(context).push<void>(
+                          CreateOrUpdateTaskPage.route(existingTask: task),
+                        );
+                      },
+                      icon: Icon(
+                        Icons.edit,
+                        color: theme.primaryColor,
+                      ),
                     ),
-                  ),
                 ],
               ),
               if (task.shortDescription != null) ...[

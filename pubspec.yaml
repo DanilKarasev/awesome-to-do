@@ -10,6 +10,7 @@ environment:
   sdk: '>=3.4.3 <4.0.0'
 
 dependencies:
+  analyzer: ^6.4.1
   auto_route: ^8.3.0
   bloc: ^8.1.4
   bot_toast: ^4.1.3

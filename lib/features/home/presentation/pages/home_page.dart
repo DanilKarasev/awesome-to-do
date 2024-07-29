@@ -1,3 +1,4 @@
+import 'package:awesome_to_do/features/create_or_update_task/presentation/pages/create_or_update_task_page.dart';
 import 'package:awesome_to_do/features/home/presentation/bloc/home_cubit.dart';
 import 'package:awesome_to_do/features/home/presentation/widgets/tasks_tab_view.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +64,9 @@ class HomePage extends StatelessWidget {
         body: const TasksTabView(),
         floatingActionButton: Builder(builder: (context) {
           return FloatingActionButton(
-            onPressed: context.read<HomeCubit>().addDummyTaskToDB,
+            onPressed: () => Navigator.of(context).push<void>(
+              CreateOrUpdateTaskPage.route(),
+            ),
             child: const Icon(Icons.add),
           );
         }),

@@ -6,6 +6,7 @@ import '../utils/text_field_validators.dart';
 class GenericTextFormField extends StatelessWidget {
   final String label;
   final String? hint;
+  final String? initialValue;
   final TextEditingController? editingController;
   final bool enabled, readOnly;
   final FocusNode? focusNode;
@@ -30,36 +31,40 @@ class GenericTextFormField extends StatelessWidget {
   final TextStyle? textStyle;
   final TextStyle? errorStyle;
   final IconData? prefixIcon;
-  const GenericTextFormField(
-      {super.key,
-      required this.label,
-      this.hint,
-      this.editingController,
-      this.inputType = TextInputType.text,
-      this.enabled = true,
-      this.focusNode,
-      this.validators,
-      this.onChanged,
-      this.inputFormatters,
-      this.onSubmitted,
-      this.onFocusChange,
-      this.onSuffixIconClick,
-      this.textCapitalization = TextCapitalization.sentences,
-      this.errorText,
-      this.isRequired = false,
-      this.obscureText = false,
-      this.autoValidateMode = AutovalidateMode.disabled,
-      this.textInputAction,
-      this.onTap,
-      this.onEditingComplete,
-      this.labelTextStyle,
-      this.contentPadding =
-          const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
-      this.suffixIcon,
-      this.readOnly = false,
-      this.textStyle,
-      this.errorStyle,
-      this.prefixIcon});
+  final int? maxLength;
+  const GenericTextFormField({
+    super.key,
+    required this.label,
+    this.hint,
+    this.initialValue,
+    this.editingController,
+    this.inputType = TextInputType.text,
+    this.enabled = true,
+    this.focusNode,
+    this.validators,
+    this.onChanged,
+    this.inputFormatters,
+    this.onSubmitted,
+    this.onFocusChange,
+    this.onSuffixIconClick,
+    this.textCapitalization = TextCapitalization.sentences,
+    this.errorText,
+    this.isRequired = false,
+    this.obscureText = false,
+    this.autoValidateMode = AutovalidateMode.disabled,
+    this.textInputAction,
+    this.onTap,
+    this.onEditingComplete,
+    this.labelTextStyle,
+    this.contentPadding =
+        const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
+    this.suffixIcon,
+    this.readOnly = false,
+    this.textStyle,
+    this.errorStyle,
+    this.maxLength,
+    this.prefixIcon,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +74,9 @@ class GenericTextFormField extends StatelessWidget {
         FocusScope(
           onFocusChange: onFocusChange,
           child: TextFormField(
+            initialValue: initialValue,
             style: textStyle,
+            maxLength: maxLength,
             inputFormatters: inputFormatters,
             textCapitalization: inputType == TextInputType.text
                 ? textCapitalization

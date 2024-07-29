@@ -8,7 +8,7 @@ abstract class TasksRepository {
   });
 
   Future<void> updateExisting(
-    TaskEntity task, {
+    TaskEntity newValue, {
     String workspaceId = FS.defaultWorkspaceCollectionId,
   });
 

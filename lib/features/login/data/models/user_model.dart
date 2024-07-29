@@ -25,14 +25,4 @@ class UserModel extends UserEntity {
       photo: entity.photo,
     );
   }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'email': email,
-      'name': name,
-      'photo': photo, //TODO add base64 encoding
-    };
-  }
 }
