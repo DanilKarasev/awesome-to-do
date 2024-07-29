@@ -5,6 +5,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'app/app.dart';
+import 'firebase_options.dart';
 import 'hive.dart';
 
 void main() async {
@@ -15,7 +16,7 @@ void main() async {
 Future<void> mainInitSetup() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   configureInjection();
   await initHive();
   initializeDateFormatting("ru_RU", null);

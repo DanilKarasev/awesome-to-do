@@ -26,7 +26,7 @@ class TasksList extends StatelessWidget {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: onRefresh,
-      child: taskList.isEmpty
+      child: taskList.isEmpty && isLoaded
           ? TaskListEmptyState(
               text: 'There are no ${tabName.capitalize()} items',
             )
