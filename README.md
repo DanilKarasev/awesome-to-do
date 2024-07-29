@@ -1,30 +1,30 @@
 # awesome_to_do
 
-A new Flutter project.
+A very simple ToDo App
 
-## Getting Started
+## Stack
 
-This project is a starting point for a Flutter application that follows the
-[simple app state management
-tutorial](https://flutter.dev/docs/development/data-and-backend/state-mgmt/simple).
+GetIt;
+Injection:
+Bloc;
+Clean Acrhitecture;
+Firebase | Auth | Firestore;
+Hive;
 
-For help getting started with Flutter development, view the
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## MVP Features
 
-## Assets
+1. email | password login
+2. Google Authethication
 
-The `assets` directory houses images, fonts, and any other files you want to
-include with your application.
+1. Create Tasks
+2. Change Task Status (backlog -> in_progress -> done)
+3. Edit Task Details
+4. Get task updates in real time
 
-The `assets/images` directory contains [resolution-aware
-images](https://flutter.dev/docs/development/ui/assets-and-images#resolution-aware).
+## Future Version Plan
 
-## Localization
-
-This project generates localized messages based on arb files found in
-the `lib/src/localization` directory.
-
-To support additional languages, please visit the tutorial on
-[Internationalizing Flutter
-apps](https://flutter.dev/docs/development/accessibility-and-localization/internationalization)
+1. Local Cache <-> Firestore independent sync
+2. Offline Mode
+3. Workspaces
+4. Task Attachments
+5. Assignee | Requestor
