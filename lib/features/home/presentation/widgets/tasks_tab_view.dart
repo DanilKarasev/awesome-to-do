@@ -70,11 +70,12 @@ class _SignQueueTabBarState extends State<TasksTabView>
                     TasksList(
                       taskList: state.getListBasedOnStatus(tab),
                       tabName: tab.name,
+                      isLoaded: state.getLoadingValueBasedOnStatus(tab),
                       onTap: (TaskEntity task) => cubit.openTaskDetails(
                         context: context,
                         task: task,
                       ),
-                      onRefresh: () => cubit.fetchTasks(
+                      onRefresh: () => cubit.reFetchTasks(
                         listToFetch: tab,
                       ),
                     ),

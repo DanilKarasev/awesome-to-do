@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,6 +22,7 @@ class AppView extends StatelessWidget {
         appBarTheme: AppBarTheme(color: bgColor),
       ),
       darkTheme: ThemeData.dark(),
+      builder: BotToastInit(),
       home: FlowBuilder<AppStatus>(
         state: context.select((AppBloc bloc) => bloc.state.status),
         onGeneratePages: onGenerateAppViewPages,

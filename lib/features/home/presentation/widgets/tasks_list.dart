@@ -1,4 +1,5 @@
 import 'package:awesome_to_do/core/utils/string_extensons.dart';
+import 'package:awesome_to_do/features/home/presentation/widgets/task_item_shimmer.dart';
 import 'package:awesome_to_do/features/home/presentation/widgets/task_list_item.dart';
 import 'package:flutter/material.dart';
 
@@ -10,6 +11,7 @@ class TasksList extends StatelessWidget {
   final List<TaskEntity> taskList;
   final Function(TaskEntity task) onTap;
   final RefreshCallback onRefresh;
+  final bool isLoaded;
 
   const TasksList({
     super.key,
@@ -17,6 +19,7 @@ class TasksList extends StatelessWidget {
     required this.tabName,
     required this.onTap,
     required this.onRefresh,
+    required this.isLoaded,
   });
 
   @override
@@ -28,17 +31,20 @@ class TasksList extends StatelessWidget {
               text: 'There are no ${tabName.capitalize()} items',
             )
           : ListView.separated(
-              itemBuilder: (_, int index) => TaskListItem(
-                onTap: (TaskEntity task) => onTap(task),
-                task: taskList[index],
-              ),
+              physics: isLoaded ? null : const NeverScrollableScrollPhysics(),
+              itemBuilder: (_, int index) => isLoaded
+                  ? TaskListItem(
+                      onTap: (TaskEntity task) => onTap(task),
+                      task: taskList[index],
+                    )
+                  : const TaskItemShimmer(),
               separatorBuilder: (context, _) {
                 return const Divider(
                   thickness: 1,
                   height: 1,
                 );
               },
-              itemCount: taskList.length,
+              itemCount: isLoaded ? taskList.length : 30,
             ),
     );
   }

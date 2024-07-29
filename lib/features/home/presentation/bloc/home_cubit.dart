@@ -1,79 +1,198 @@
+import 'dart:async';
 import 'dart:math';
 
+import 'package:awesome_to_do/features/home/domain/repositories/tasks_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+import 'package:uuid/uuid.dart';
 
+import '../../../../core/failures.dart';
+import '../../../../core/widgets/toast.dart';
 import '../../../../injection.dart';
-import '../../../login/domain/repositories/auth_repository.dart';
+import '../../data/models/task_model.dart';
 import '../../domain/entities/task_entity.dart';
 import '../pages/task_details_bottomsheet.dart';
 
 part 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
-  HomeCubit() : super(const HomeState());
-  final AuthRepository _authRepository = getIt<AuthRepository>();
+  HomeCubit() : super(const HomeState()) {
+    _init();
+  }
+  final TasksRepository _tasksRepository = getIt<TasksRepository>();
 
-  void init() async {}
+  StreamSubscription<List<TaskEntity>>? _uncheckedTasksListener;
+  StreamSubscription<List<TaskEntity>>? _inProgressTasksListener;
+  StreamSubscription<List<TaskEntity>>? _completedTasksListener;
 
-  Future<void> fetchTasks({required TaskStatus listToFetch}) async {
-    // TODO Fetch from DB and refresh UI
+  final uuid = const Uuid();
+  final Logger logger = Logger(printer: PrettyPrinter());
+
+  /// Streams will be only guys who updating the UI
+  /// Ideally - it should be cached and UI rebuild should happen immediately
+  /// and independent from DB, and sync later
+  void _init() async {
+    await Future.wait([
+      initUncheckedSnapshotListener(),
+      initInProgressSnapshotListener(),
+      initCompletedSnapshotListener(),
+    ]);
+  }
+
+  Future<void> reFetchTasks({required TaskStatus listToFetch}) async {
+    try {
+      _setIsLoadedForList(listToFetch, false);
+      await _tasksRepository.getTasksList(listToFetch);
+      _setIsLoadedForList(listToFetch, true);
+    } on FirestoreFailure catch (error, stackTrace) {
+      _setIsLoadedForList(listToFetch, true);
+      Toast.show(status: ToastStatus.error, message: error.message);
+      logger.e(error.message, error: error, stackTrace: stackTrace);
+    }
+  }
+
+  void _setIsLoadedForList(TaskStatus list, bool val) {
+    switch (list) {
+      case (TaskStatus.done):
+        emit(state.copyWith(loadedCompletedTasks: val));
+      case (TaskStatus.doing):
+        emit(state.copyWith(loadedInProgressTasks: val));
+      case (TaskStatus.unchecked):
+      default:
+        emit(state.copyWith(loadedUncheckedTasks: val));
+    }
+  }
+
+  Future<void> initUncheckedSnapshotListener() async {
+    try {
+      _uncheckedTasksListener =
+          _tasksRepository.getTasksStream(TaskStatus.unchecked).listen(
+        (tasks) {
+          final Map<String, TaskEntity> uncheckedTasks = {};
+          for (var task in tasks) {
+            uncheckedTasks[task.id] = task;
+          }
+          emit(state.copyWith(
+            uncheckedTasks: uncheckedTasks,
+            loadedUncheckedTasks: true,
+          ));
+        },
+      );
+    } on FirestoreFailure catch (error, stackTrace) {
+      Toast.show(status: ToastStatus.error, message: error.message);
+      logger.e(error.message, error: error, stackTrace: stackTrace);
+    }
+  }
+
+  Future<void> initInProgressSnapshotListener() async {
+    try {
+      _inProgressTasksListener =
+          _tasksRepository.getTasksStream(TaskStatus.doing).listen(
+        (tasks) {
+          final Map<String, TaskEntity> inProgressTasks = {};
+          for (var task in tasks) {
+            inProgressTasks[task.id] = task;
+          }
+          emit(state.copyWith(
+            inProgressTasks: inProgressTasks,
+            loadedInProgressTasks: true,
+          ));
+        },
+      );
+    } on FirestoreFailure catch (error, stackTrace) {
+      Toast.show(status: ToastStatus.error, message: error.message);
+      logger.e(error.message, error: error, stackTrace: stackTrace);
+    }
+  }
+
+  Future<void> initCompletedSnapshotListener() async {
+    try {
+      _completedTasksListener =
+          _tasksRepository.getTasksStream(TaskStatus.done).listen(
+        (tasks) {
+          final Map<String, TaskEntity> completedTasks = {};
+          for (var task in tasks) {
+            completedTasks[task.id] = task;
+          }
+          emit(state.copyWith(
+            doneTasks: completedTasks,
+            loadedCompletedTasks: true,
+          ));
+        },
+      );
+    } on FirestoreFailure catch (error, stackTrace) {
+      Toast.show(status: ToastStatus.error, message: error.message);
+      logger.e(error.message, error: error, stackTrace: stackTrace);
+    }
+  }
+
+  Future<void> createNewTask(TaskEntity task) async {
+    try {
+      await _tasksRepository.createNew(task);
+    } on FirestoreFailure catch (error, stackTrace) {
+      Toast.show(status: ToastStatus.error, message: error.message);
+      logger.e(error.message, error: error, stackTrace: stackTrace);
+    }
   }
 
   void changeTaskStatus({
     required TaskEntity task,
     required TaskStatus newStatus,
   }) async {
-    // Update UI and sync DB simultaneously
-    final TaskEntity updatedTask = task.copyWith(status: newStatus);
-
-    final uncheckedTasks = {...state.uncheckedTasks};
-    final inProgressTasks = {...state.inProgressTasks};
-    final doneTasks = {...state.doneTasks};
-
-    uncheckedTasks.remove(task.id);
-    inProgressTasks.remove(task.id);
-    doneTasks.remove(task.id);
-
-    if (newStatus.isUnchecked) {
-      uncheckedTasks[task.id] = updatedTask;
-    } else if (newStatus.isDoing) {
-      inProgressTasks[task.id] = updatedTask;
-    } else if (newStatus.isDone) {
-      doneTasks[task.id] = updatedTask;
+    try {
+      await _tasksRepository.moveToAnotherCollection(task, newStatus);
+    } on FirestoreFailure catch (error, stackTrace) {
+      Toast.show(status: ToastStatus.error, message: error.message);
+      logger.e(error.message, error: error, stackTrace: stackTrace);
     }
-
-    emit(state.copyWith(
-      allTasks: {...state.allTasks, task.id: updatedTask},
-      uncheckedTasks: uncheckedTasks,
-      inProgressTasks: inProgressTasks,
-      doneTasks: doneTasks,
-    ));
-
-    //TODO Call DB update task
-    await Future.delayed(Durations.medium2);
+    // Updating UI only
+    // final TaskEntity updatedTask = task.copyWith(status: newStatus);
+    //
+    // final uncheckedTasks = {...state.uncheckedTasks};
+    // final inProgressTasks = {...state.inProgressTasks};
+    // final doneTasks = {...state.doneTasks};
+    //
+    // uncheckedTasks.remove(task.id);
+    // inProgressTasks.remove(task.id);
+    // doneTasks.remove(task.id);
+    //
+    // if (newStatus.isUnchecked) {
+    //   uncheckedTasks[task.id] = updatedTask;
+    // } else if (newStatus.isDoing) {
+    //   inProgressTasks[task.id] = updatedTask;
+    // } else if (newStatus.isDone) {
+    //   doneTasks[task.id] = updatedTask;
+    // }
+    //
+    // emit(state.copyWith(
+    //   uncheckedTasks: uncheckedTasks,
+    //   inProgressTasks: inProgressTasks,
+    //   doneTasks: doneTasks,
+    // ));
   }
 
   void discardTask(TaskEntity task) async {
-    final allTasks = {...state.allTasks};
-    final uncheckedTasks = {...state.uncheckedTasks};
-    final inProgressTasks = {...state.inProgressTasks};
-    final doneTasks = {...state.doneTasks};
-
-    allTasks.remove(task.id);
-    uncheckedTasks.remove(task.id);
-    inProgressTasks.remove(task.id);
-    doneTasks.remove(task.id);
-    emit(state.copyWith(
-      allTasks: allTasks,
-      uncheckedTasks: uncheckedTasks,
-      inProgressTasks: inProgressTasks,
-      doneTasks: doneTasks,
-    ));
-
-    //TODO Call DB update task
-    await Future.delayed(Durations.medium2);
+    try {
+      await _tasksRepository.deleteTask(task);
+    } on FirestoreFailure catch (error, stackTrace) {
+      Toast.show(status: ToastStatus.error, message: error.message);
+      logger.e(error.message, error: error, stackTrace: stackTrace);
+    }
+    // Updating UI only
+    // final uncheckedTasks = {...state.uncheckedTasks};
+    // final inProgressTasks = {...state.inProgressTasks};
+    // final doneTasks = {...state.doneTasks};
+    //
+    // uncheckedTasks.remove(task.id);
+    // inProgressTasks.remove(task.id);
+    // doneTasks.remove(task.id);
+    // emit(state.copyWith(
+    //   uncheckedTasks: uncheckedTasks,
+    //   inProgressTasks: inProgressTasks,
+    //   doneTasks: doneTasks,
+    // ));
   }
 
   void openTaskDetails({
@@ -107,7 +226,11 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
-  void addDummyTask() {
+  void addDummyTaskToDB() async {
+    await _tasksRepository.createNew(TaskModel.dummy);
+  }
+
+  void addDummyTaskUI() {
     int rnd = Random().nextInt(3);
     TaskStatus status = TaskStatus.unchecked;
     if (rnd == 1) {
@@ -120,7 +243,6 @@ class HomeCubit extends Cubit<HomeState> {
     final newTaskMap = {newTask.id: newTask};
 
     emit(state.copyWith(
-      allTasks: {...state.allTasks, ...newTaskMap},
       uncheckedTasks: status.isUnchecked
           ? {...state.uncheckedTasks, ...newTaskMap}
           : state.uncheckedTasks,
@@ -130,5 +252,13 @@ class HomeCubit extends Cubit<HomeState> {
       doneTasks:
           status.isDone ? {...state.doneTasks, ...newTaskMap} : state.doneTasks,
     ));
+  }
+
+  @override
+  Future<void> close() {
+    _uncheckedTasksListener?.cancel();
+    _inProgressTasksListener?.cancel();
+    _completedTasksListener?.cancel();
+    return super.close();
   }
 }

@@ -1,8 +1,9 @@
 import 'package:awesome_to_do/core/widgets/generic_hold_to_perform_button.dart';
-import 'package:awesome_to_do/core/widgets/generic_snackbar.dart';
 import 'package:awesome_to_do/features/home/domain/entities/task_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import '../../../../core/widgets/toast.dart';
 
 class TaskDetailsBottomSheet extends StatelessWidget {
   final TaskEntity task;
@@ -41,9 +42,12 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                           size: 32,
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          task.title,
-                          style: Theme.of(context).textTheme.headlineLarge,
+                        Expanded(
+                          child: Text(
+                            task.title,
+                            style: Theme.of(context).textTheme.headlineLarge,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ],
                     ),
@@ -90,9 +94,9 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                           ),
                           onPressed: () {
                             onStatusUpdate(TaskStatus.doing);
-                            showSnackBar(
-                              context,
-                              label: 'You started to work on this task',
+                            Toast.show(
+                              status: ToastStatus.success,
+                              message: "You started to work on this task",
                             );
                             Navigator.of(context).maybePop();
                           },
@@ -110,10 +114,9 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                           ),
                           onPressed: () {
                             onStatusUpdate(TaskStatus.done);
-                            showSnackBar(
-                              context,
-                              label: "You've completed this task!",
-                            );
+                            Toast.show(
+                                status: ToastStatus.success,
+                                message: "You've completed this task!");
                             Navigator.of(context).maybePop();
                           },
                           child: const Text(
@@ -152,9 +155,9 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                     label: 'Hold to Discard',
                     onConfirm: () {
                       onDiscard(task);
-                      showSnackBar(
-                        context,
-                        label: 'Task deleted!',
+                      Toast.show(
+                        status: ToastStatus.success,
+                        message: "Task deleted successfully!",
                       );
                       Navigator.of(context).maybePop();
                     },

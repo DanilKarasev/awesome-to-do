@@ -5,6 +5,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/constants/db_constants.dart';
+
 enum TaskStatus {
   unchecked('unchecked', failureColor, Icons.warning_rounded),
   doing('doing', alertColor, Icons.pending),
@@ -15,6 +17,40 @@ enum TaskStatus {
   bool get isDone => this == TaskStatus.done;
 
   String get displayLbl => lbl.capitalize();
+
+  String get fsCollectionId {
+    if (isDoing) {
+      return FS.inProgressTasks;
+    }
+    if (isDone) {
+      return FS.completedTasks;
+    }
+    return FS.backlogTasks;
+  }
+
+  static TaskStatus fromJson(String? val) {
+    switch (val) {
+      case 'in_progress':
+        return TaskStatus.doing;
+      case 'done':
+        return TaskStatus.done;
+      case 'backlog':
+      default:
+        return TaskStatus.unchecked;
+    }
+  }
+
+  String get dbRecordStringVal {
+    switch (this) {
+      case TaskStatus.doing:
+        return 'in_progress';
+      case TaskStatus.done:
+        return 'done';
+      case TaskStatus.unchecked:
+      default:
+        return 'backlog';
+    }
+  }
 
   final String lbl;
   final Color color;

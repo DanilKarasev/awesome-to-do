@@ -1,11 +1,11 @@
 import 'package:awesome_to_do/core/utils/text_field_validators.dart';
-import 'package:awesome_to_do/core/widgets/generic_snackbar.dart';
 import 'package:awesome_to_do/core/widgets/generic_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:formz/formz.dart';
 
+import '../../../../core/widgets/toast.dart';
 import '../../../sign_up/presentation/pages/sign_up_page.dart';
 import '../bloc/login_cubit.dart';
 
@@ -17,9 +17,9 @@ class LoginForm extends StatelessWidget {
     return BlocListener<LoginCubit, LoginState>(
       listener: (context, state) {
         if (state.status.isFailure) {
-          showSnackBar(
-            context,
-            label: state.errorMessage ?? 'Authentication Failure',
+          Toast.show(
+            status: ToastStatus.error,
+            message: state.errorMessage ?? 'Authentication Failure',
           );
         }
       },

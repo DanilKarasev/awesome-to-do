@@ -1,10 +1,10 @@
-import 'package:awesome_to_do/core/widgets/generic_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 
 import '../../../../core/utils/text_field_validators.dart';
 import '../../../../core/widgets/generic_text_form_field.dart';
+import '../../../../core/widgets/toast.dart';
 import '../../bloc/sign_up_cubit.dart';
 
 class SignUpForm extends StatelessWidget {
@@ -17,11 +17,9 @@ class SignUpForm extends StatelessWidget {
         if (state.status.isSuccess) {
           Navigator.of(context).pop();
         } else if (state.status.isFailure) {
-          showSnackBar(
-            context,
-            label: state.errorMessage ?? 'Sign Up Failure',
-            status: SnackStatus.error,
-          );
+          Toast.show(
+              status: ToastStatus.error,
+              message: state.errorMessage ?? 'Sign Up Failure');
         }
       },
       child: Padding(

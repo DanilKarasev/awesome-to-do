@@ -19,7 +19,7 @@ class HomePage extends StatelessWidget {
     final user = context.select((AppBloc bloc) => bloc.state.user);
 
     return BlocProvider(
-      create: (_) => HomeCubit()..init(),
+      create: (_) => HomeCubit(),
       child: Scaffold(
         appBar: AppBar(
           title: Text(context.read<AppBloc>().appName),
@@ -63,7 +63,7 @@ class HomePage extends StatelessWidget {
         body: const TasksTabView(),
         floatingActionButton: Builder(builder: (context) {
           return FloatingActionButton(
-            onPressed: context.read<HomeCubit>().addDummyTask,
+            onPressed: context.read<HomeCubit>().addDummyTaskToDB,
             child: const Icon(Icons.add),
           );
         }),

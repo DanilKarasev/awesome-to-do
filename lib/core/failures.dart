@@ -119,3 +119,28 @@ class LogOutFailure implements Exception {
     this.message = 'An unknown exception occurred.',
   ]);
 }
+
+class FirestoreFailure implements Exception {
+  final String message;
+  FirestoreFailure(this.message);
+}
+
+class AddTaskFailure extends FirestoreFailure {
+  AddTaskFailure(super.message);
+}
+
+class UpdateTaskFailure extends FirestoreFailure {
+  UpdateTaskFailure(super.message);
+}
+
+class DeleteTaskFailure extends FirestoreFailure {
+  DeleteTaskFailure(super.message);
+}
+
+class GetTaskFailure extends FirestoreFailure {
+  GetTaskFailure(super.message);
+}
+
+class GetTasksFailure extends FirestoreFailure {
+  GetTasksFailure(super.message);
+}

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -20,6 +21,9 @@ abstract class RegisterModule {
 
   @LazySingleton()
   FirebaseAuth get firebaseAuth => FirebaseAuth.instance;
+
+  @LazySingleton()
+  FirebaseFirestore get firebaseFirestore => FirebaseFirestore.instance;
 
   @LazySingleton()
   GoogleSignIn get googleSignIn => GoogleSignIn.standard();
